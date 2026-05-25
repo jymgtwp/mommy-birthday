@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>黄色康乃馨 - 妈妈生日快乐</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #fff8ec 0%, #fff2df 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Quicksand', 'Poppins', 'Dancing Script', cursive, system-ui, -apple-system;
+            padding: 20px;
+        }
+
+        /* 主卡片 - 简洁温暖，突出康乃馨和文字 */
+        .card {
+            max-width: 620px;
+            width: 100%;
+            background: rgba(255, 252, 245, 0.96);
+            border-radius: 60px;
+            box-shadow: 0 25px 40px rgba(243, 156, 18, 0.15), 0 8px 18px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(0px);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            border: 1px solid #ffe2b5;
+            padding: 30px 28px 40px 28px;
+            text-align: center;
+        }
+
+        /* 画布区域: 数字绘画风格 */
+        .digital-art {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-width: 500px;
+            border-radius: 48px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(250, 200, 100, 0.4);
+            background: #fffcf0;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        canvas:active {
+            transform: scale(0.99);
+        }
+
+        /* 只有指定文字区域，纯净祝福 */
+        .message {
+            margin-top: 20px;
+            padding: 8px 12px;
+        }
+
+        .blessing {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            background: linear-gradient(135deg, #e2891a, #f7b842);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 12px rgba(255, 180, 70, 0.2);
+            font-family: 'Quicksand', 'Poppins', sans-serif;
+            line-height: 1.3;
+            word-break: keep-all;
+            display: inline-block;
+        }
+
+        /* 点缀的小星星和爱心装饰（纯CSS装饰，不干扰画布） */
+        .floating-deco {
+            position: relative;
+            margin-top: 12px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            pointer-events: none;
+        }
+
+        .deco-icon {
+            font-size: 1.2rem;
+            display: inline-block;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            animation: gentleFloat 3s infinite ease-in-out;
+        }
+
+        @keyframes gentleFloat {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .deco-icon:nth-child(2) { animation-delay: 0.4s; }
+        .deco-icon:nth-child(3) { animation-delay: 0.7s; }
+        .deco-icon:nth-child(4) { animation-delay: 0.2s; }
+        .deco-icon:nth-child(5) { animation-delay: 0.9s; }
+
+        /* 响应式 */
+        @media (max-width: 550px) {
+            .card {
+                padding: 20px 18px 30px 18px;
+            }
+            .blessing {
+                font-size: 1.7rem;
+            }
+            .deco-icon {
+                font-size: 1rem;
+            }
+        }
+
+        /* 可选小爱心 */
+        .heart-star-group {
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <!-- 数字绘画康乃馨 -->
+    <div class="digital-art">
+        <canvas id="carnationCanvas" width="500" height="500" style="width:100%; height:auto; max-width:500px; aspect-ratio:1/1"></canvas>
+    </div>
+
+    <!-- 只有要求的文字，不加任何多余大段描述 -->
+    <div class="message">
+        <div class="blessing">Mommy Happy Birthday I Love You</div>
+    </div>
+
+    <!-- 装饰性的黄色星星和爱心（点缀，完全独立，满足“加一些黄色的心或者星星”需求） -->
+    <div class="floating-deco">
+        <span class="deco-icon">⭐️</span>
+        <span class="deco-icon">💛</span>
+        <span class="deco-icon">🌟</span>
+        <span class="deco-icon">💛</span>
+        <span class="deco-icon">⭐️</span>
+        <span class="deco-icon">✨</span>
+        <span class="deco-icon">💛</span>
+        <span class="deco-icon">🌟</span>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const canvas = document.getElementById('carnationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 高清画布
+        const size = 500;
+        canvas.width = size;
+        canvas.height = size;
+        
+        // 柔和暖色基底 (极简数字绘画风格)
+        function drawBackground() {
+            const grad = ctx.createLinearGradient(0, 0, size, size);
+            grad.addColorStop(0, '#fffcf0');
+            grad.addColorStop(1, '#fff7e8');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, size, size);
+            // 轻微纸张纹理 (增加数字手绘感)
+            ctx.globalCompositeOperation = 'overlay';
+            ctx.globalAlpha = 0.08;
+            for(let i=0;i<600;i++) {
+                ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.15})`;
+                ctx.fillRect(Math.random()*size, Math.random()*size, 1.2, 1.2);
+            }
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1.0;
+        }
+        
+        // 绘制叶片 (清爽绿色)
+        function drawLeaf(x, y, angle, w, h, color) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, w, h, 0, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            // 简单叶脉
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(w * 0.7, 0);
+            ctx.lineWidth = 1.2;
+            ctx.strokeStyle = '#517a1a';
+            ctx.stroke();
+            ctx.restore();
+        }
+        
+        // 康乃馨花瓣函数：数字风格半圆弧叠加，饱满明黄
+        function drawPetal(x, y, rx, ry, angle, mainColor, highlightColor) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+            // 微渐变增加立体感
+            const grad = ctx.createLinearGradient(-rx*0.3, -ry*0.2, rx*0.5, ry*0.6);
+            grad.addColorStop(0, mainColor);
+            grad.addColorStop(1, highlightColor);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            // 细微纹理短笔触
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rx*0.7, ry*0.65, 0, 0, Math.PI * 2);
+            ctx.fillStyle = highlightColor + 'aa';
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        // 绘制花萼和花梗 (干净简约)
+        function drawStemsAndCalyx() {
+            // 主花茎
+            ctx.beginPath();
+            ctx.moveTo(250, 370);
+            ctx.quadraticCurveTo(235, 440, 200, 500);
+            ctx.lineTo(212, 500);
+            ctx.quadraticCurveTo(248, 445, 262, 370);
+            ctx.fillStyle = '#5f8c2a';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(265, 370);
+            ctx.quadraticCurveTo(285, 430, 320, 485);
+            ctx.lineTo(307, 485);
+            ctx.quadraticCurveTo(275, 432, 270, 370);
+            ctx.fill();
+            // 辅茎小花枝
+            ctx.beginPath();
+            ctx.moveTo(275, 385);
+            ctx.quadraticCurveTo(310, 420, 350, 450);
+            ctx.lineTo(342, 445);
+            ctx.quadraticCurveTo(304, 412, 275, 380);
+            ctx.fill();
+            
+            // 花萼 (小萼片)
+            for(let i=0;i<5;i++) {
+                let angle = -0.7 + i * 0.6;
+                let sx = 250 + Math.sin(angle)*18;
+                let sy = 365 + Math.cos(angle)*9;
+                ctx.beginPath();
+                ctx.moveTo(250, 355);
+                ctx.lineTo(sx, sy);
+                ctx.lineTo(248 + Math.sin(angle-0.3)*14, 352+Math.cos(angle)*7);
+                ctx.fillStyle = '#507a1a';
+                ctx.fill();
+            }
+        }
+        
+        // 绘制一束明亮黄色康乃馨 (簇拥感 + 金黄色调)
+        function drawCarnationBouquet() {
+            // 花朵位置: 主花周围环绕几朵形成花束，全部黄色系，digital 风格
+            const flowers = [
+                { x: 250, y: 270, scale: 1.0, base: '#FFC043', mid: '#FDB11B', dark: '#E39412' },   // 中央主花
+                { x: 200, y: 305, scale: 0.76, base: '#FFCD5C', mid: '#F7B132', dark: '#DE9216' },
+                { x: 305, y: 298, scale: 0.78, base: '#FFCF64', mid: '#F5B73A', dark: '#E09D1A' },
+                { x: 228, y: 225, scale: 0.73, base: '#FFC754', mid: '#F3AD2C', dark: '#DB9315' },
+                { x: 282, y: 238, scale: 0.74, base: '#FFCB5E', mid: '#F5B33A', dark: '#E19A1B' },
+                { x: 168, y: 270, scale: 0.68, base: '#FDBC4A', mid: '#F2A82E', dark: '#D78C12' },
+                { x: 338, y: 265, scale: 0.69, base: '#FFC256', mid: '#F4AE34', dark: '#DE9418' },
+                { x: 275, y: 208, scale: 0.67, base: '#FFD36B', mid: '#FABA44', dark: '#E6A31F' },   // 上方小花点缀
+                { x: 215, y: 195, scale: 0.64, base: '#FFCA60', mid: '#F5B23A', dark: '#DF981A' }
+            ];
+            
+            // 先画背景的层次绿叶 (衬托康乃馨)
+            for(let i=0;i<24;i++) {
+                let rad = 75 + Math.random() * 150;
+                let angle = Math.random() * Math.PI * 2;
+                let lx = 250 + Math.cos(angle) * rad;
+                let ly = 340 + Math.sin(angle) * rad * 0.65;
+                if(lx > 50 && lx < 450 && ly > 300 && ly < 520) {
+                    let leafSize = 7 + Math.random() * 7;
+                    drawLeaf(lx, ly, angle + 0.8, leafSize, 4 + Math.random()*5, i%2===0 ? '#6F9A2E' : '#57831F');
+                }
+            }
+            
+            // 底层大型衬叶
+            drawLeaf(180, 430, -0.5, 24, 9, '#6B9329');
+            drawLeaf(320, 425, 0.7, 26, 10, '#618B27');
+            drawLeaf(140, 390, -0.9, 19, 8, '#7EA535');
+            drawLeaf(360, 395, 0.9, 20, 8, '#6F9830');
+            
+            // 绘制每一朵康乃馨（数字质感多层花瓣）
+            flowers.forEach(fl => {
+                ctx.save();
+                const cx = fl.x;
+                const cy = fl.y;
+                const s = fl.scale;
+                const petalCount = 20;
+                // 外层大花瓣
+                for(let i=0; i<petalCount; i++) {
+                    let angle = (Math.PI * 2 / petalCount) * i;
+                    let radW = (17 + 2.8 * Math.sin(angle * 3)) * s;
+                    let radH = (23 + 3.5 * Math.cos(angle * 2)) * s;
+                    let dist = 11 * s;
+                    let px = cx + Math.cos(angle) * dist;
+                    let py = cy + Math.sin(angle) * dist * 0.88;
+                    let petalColor = i % 3 === 0 ? fl.base : fl.mid;
+                    drawPetal(px, py, radW * 0.92, radH * 0.85, angle + 0.25, petalColor, fl.dark);
+                }
+                // 中层花瓣更密集
+                for(let i=0; i<26; i++) {
+                    let angle = (Math.PI * 2 / 26) * i + 0.45;
+                    let radW = (12 + 2.2 * Math.sin(angle * 4)) * s;
+                    let radH = (15 + 2.5 * Math.cos(angle * 3)) * s;
+                    let dist = 6.5 * s;
+                    let px = cx + Math.cos(angle) * dist;
+                    let py = cy + Math.sin(angle) * dist * 0.85;
+                    drawPetal(px, py, radW, radH, angle, fl.mid, '#F5A623');
+                }
+                // 花芯
+                ctx.beginPath();
+                ctx.arc(cx, cy, 8*s, 0, Math.PI*2);
+                ctx.fillStyle = '#F2941F';
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(cx-1.5*s, cy-1.2*s, 3.2*s, 0, Math.PI*2);
+                ctx.fillStyle = '#E27C16';
+                ctx.fill();
+                // 花蕊点彩，增加数字手绘感
+                for(let k=0;k<45;k++) {
+                    let r = Math.random() * 8 * s;
+                    let a = Math.random() * Math.PI * 2;
+                    let dx = cx + Math.cos(a) * r;
+                    let dy = cy + Math.sin(a) * r;
+                    ctx.beginPath();
+                    ctx.arc(dx, dy, 0.9+Math.random()*1.3, 0, 2*Math.PI);
+                    ctx.fillStyle = `rgba(230, 100, 20, ${0.5+Math.random()*0.4})`;
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
+            
+            // 增加飘落或装饰小花瓣 (黄色星星感)
+            for(let i=0;i<55;i++) {
+                let x_ran = 120 + Math.random() * 260;
+                let y_ran = 190 + Math.random() * 200;
+                if(y_ran < 360) {
+                    ctx.beginPath();
+                    ctx.ellipse(x_ran, y_ran, 2.5+Math.random()*4, 2+Math.random()*3.5, Math.random()*Math.PI, 0, 2*Math.PI);
+                    ctx.fillStyle = `rgba(255, 210, 70, ${0.4+Math.random()*0.5})`;
+                    ctx.fill();
+                }
+            }
+        }
+        
+        // 添加闪耀星星 + 黄色小爱心 (直接画在画布上，点缀康乃馨，融合"黄色的心或者星星"的明确需求)
+        function drawStarsAndHeartsOnCanvas() {
+            // 绘制金色星星 ★ 和 小爱心 ♡ 围绕花束，digital 风格干净亮眼
+            const starPositions = [
+                { x: 120, y: 180, size: 9, type: 'star' },
+                { x: 370, y: 150, size: 10, type: 'star' },
+                { x: 90, y: 280, size: 7, type: 'star' },
+                { x: 410, y: 310, size: 8, type: 'star' },
+                { x: 190, y: 130, size: 8, type: 'star' },
+                { x: 315, y: 120, size: 9, type: 'star' },
+                { x: 430, y: 220, size: 7, type: 'star' },
+                { x: 70, y: 340, size: 7, type: 'star' },
+                { x: 145, y: 420, size: 8, type: 'star' },
+                { x: 360, y: 430, size: 9, type: 'star' },
+                { x: 280, y: 460, size: 6, type: 'star' }
+            ];
+            
+            const heartPositions = [
+                { x: 145, y: 210, size: 11, type: 'heart' },
+                { x: 340, y: 190, size: 12, type: 'heart' },
+                { x: 400, y: 260, size: 10, type: 'heart' },
+                { x: 100, y: 320, size: 10, type: 'heart' },
+                { x: 220, y: 460, size: 11, type: 'heart' },
+                { x: 300, y: 445, size: 10, type: 'heart' },
+                { x: 440, y: 370, size: 9, type: 'heart' },
+                { x: 75, y: 400, size: 9, type: 'heart' },
+                { x: 270, y: 150, size: 10, type: 'heart' },
+                { x: 195, y: 105, size: 10, type: 'heart' }
+            ];
+            
+            // 画星星 (五角星简易绘制法)
+            function drawStar(px, py, r) {
+                let outerR = r;
+                let innerR = r * 0.45;
+                let spikes = 5;
+                let rot = Math.PI / 2 * 3;
+                let step = Math.PI / spikes;
+                ctx.beginPath();
+                for(let i = 0; i < spikes; i++) {
+                    let x1 = px + Math.cos(rot + i * step * 2) * outerR;
+                    let y1 = py + Math.sin(rot + i * step * 2) * outerR;
+                    let x2 = px + Math.cos(rot + (i * step * 2 + step)) * innerR;
+                    let y2 = py + Math.sin(rot + (i * step * 2 + step)) * innerR;
+                    if(i === 0) ctx.moveTo(x1, y1);
+                    else ctx.lineTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                }
+                ctx.closePath();
+                ctx.fillStyle = '#F7C530';
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = '#FFD966';
+                ctx.fill();
+                ctx.fillStyle = '#F9B81B';
+                ctx.font = `bold ${Math.floor(r*1.2)}px "Segoe UI", system-ui`;
+                ctx.shadowBlur = 2;
+            }
+            
+            // 画爱心的方法 (简单的贝塞尔心形)
+            function drawHeart(x, y, sizeHeart) {
+                ctx.save();
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = "#FFB347";
+                ctx.beginPath();
+                let heartSize = sizeHeart;
+                let topCurveHeight = heartSize * 0.3;
+                ctx.moveTo(x, y + topCurveHeight);
+                ctx.bezierCurveTo(x, y, x - heartSize/2, y, x - heartSize/2, y + topCurveHeight);
+                ctx.bezierCurveTo(x - heartSize/2, y + (heartSize*0.5), x, y + heartSize, x, y + heartSize);
+                ctx.bezierCurveTo(x, y + heartSize, x + heartSize/2, y + (heartSize*0.5), x + heartSize/2, y + topCurveHeight);
+                ctx.bezierCurveTo(x + heartSize/2, y, x, y, x, y + topCurveHeight);
+                ctx.fillStyle = '#FFC857';
+                ctx.fill();
+                ctx.fillStyle = '#FFB347';
+                ctx.font = `${Math.floor(sizeHeart*0.8)}px "Segoe UI"`;
+                ctx.restore();
+            }
+            
+            // 清除阴影避免干扰别的元素，但保留可爱感
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = "transparent";
+            starPositions.forEach(sp => {
+                drawStar(sp.x, sp.y, sp.size);
+            });
+            heartPositions.forEach(hp => {
+                drawHeart(hp.x, hp.y, hp.size);
+            });
+            
+            // 额外添加一些飘浮的细小星星点点 (黄色)
+            for(let i=0;i<45;i++) {
+                let sx = 60 + Math.random() * 380;
+                let sy = 80 + Math.random() * 400;
+                if(sy < 470 && sy > 70) {
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 1.5+Math.random()*2.5, 0, 2*Math.PI);
+                    ctx.fillStyle = `rgba(255, 215, 0, ${0.7+Math.random()*0.3})`;
+                    ctx.fill();
+                }
+            }
+        }
+        
+        // 增加一丢丢高光笔触 (数字绘画特有)
+        function digitalHighlights() {
+            ctx.globalCompositeOperation = 'lighter';
+            for(let i=0;i<120;i++) {
+                ctx.fillStyle = `rgba(255, 235, 150, ${Math.random() * 0.4})`;
+                ctx.beginPath();
+                ctx.arc(Math.random()*size, Math.random()*size, Math.random()*2, 0, 2*Math.PI);
+                ctx.fill();
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+        
+        // 花束下方系一个迷你蝴蝶结 (简单装饰增加温馨感，不影响主体)
+        function drawSimpleRibbon() {
+            ctx.save();
+            ctx.shadowBlur = 1;
+            ctx.beginPath();
+            ctx.moveTo(225, 460);
+            ctx.quadraticCurveTo(250, 475, 275, 460);
+            ctx.quadraticCurveTo(260, 480, 250, 484);
+            ctx.quadraticCurveTo(240, 480, 225, 460);
+            ctx.fillStyle = '#ECAF65';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(210, 462);
+            ctx.quadraticCurveTo(228, 475, 242, 470);
+            ctx.lineTo(232, 478);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(290, 462);
+            ctx.quadraticCurveTo(272, 475, 258, 470);
+            ctx.lineTo(268, 478);
+            ctx.fill();
+            ctx.fillStyle = '#E29D4A';
+            ctx.beginPath();
+            ctx.ellipse(250, 478, 10, 6, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        // 主渲染流程
+        function render() {
+            drawBackground();
+            drawStemsAndCalyx();      // 花枝及花萼
+            drawCarnationBouquet();   // 漂亮黄色康乃馨花束
+            drawSimpleRibbon();       // 蝴蝶结丝带
+            drawStarsAndHeartsOnCanvas();  // 黄色星星 + 爱心 (画布上)
+            digitalHighlights();       // 柔和光晕亮点
+            
+            // 最后微调边缘柔化
+            ctx.shadowBlur = 0;
+            // 加一个极淡的外发光让花束整体更柔和
+            ctx.save();
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.restore();
+        }
+        
+        render();
+        
+        // 为增加交互趣味: 点击画布让星星轻微闪烁一下 (纯娱乐)
+        canvas.addEventListener('click', () => {
+            canvas.style.transform = 'scale(0.99)';
+            setTimeout(() => {
+                canvas.style.transform = '';
+            }, 120);
+            // 快速重绘一个小闪亮效果但不影响主体, 无需重绘全部，简单加个短暂发光
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.pointerEvents = 'none';
+            overlay.style.backgroundColor = 'rgba(255, 215, 120, 0.1)';
+            overlay.style.zIndex = '999';
+            document.body.appendChild(overlay);
+            setTimeout(() => overlay.remove(), 150);
+        });
+        
+        // 自适应重绘确保比例不变 (如果窗口大小改变会导致画布模糊重绘，但为了稳健添加resize监听，不过canvas尺寸固定，但为了高分屏)
+        window.addEventListener('resize', () => {
+            render();
+        });
+        
+    })();
+</script>
+</body>
+</html>
